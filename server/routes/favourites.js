@@ -1,6 +1,7 @@
-const express = require("express");
+import express from "express";
+import db from "../database/connection.js";
+
 const router = express.Router();
-const db = require("../database/connection");
 
 // Get all favourite recipes
 router.get("/", (req, res) => {
@@ -60,4 +61,4 @@ router.delete("/:idMeal", (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;
