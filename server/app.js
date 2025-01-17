@@ -3,6 +3,11 @@ import dotenv from "dotenv";
 import mysql from "mysql2";
 import favouritesRoutes from "./routes/favourites.js";
 import cors from "cors";
+import usersRoutes from "./routes/users.js";
+import knexConfig from "../knexfile.js";
+import initKnex from "knex";
+
+const knex = initKnex(knexConfig);
 
 // Initialize the app first
 const app = express();
@@ -15,6 +20,10 @@ app.use(express.json());
 
 // Routes
 app.use("/favourites", favouritesRoutes);
+app.use("/users", usersRoutes);
+app.get("/", (req, res) => {
+  res.send("Hello");
+});
 
 // Start the server
 app.listen(port, () => {

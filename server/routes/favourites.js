@@ -1,64 +1,75 @@
 import express from "express";
-import db from "../database/connection.js";
+import knex from "../../knexfile.js";
+import authorize from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Get all favourite recipes
-router.get("/", (req, res) => {
-  db.query("SELECT * FROM favourites", (err, results) => {
-    if (err) {
-      console.error("Error fetching favourites:", err);
-      return res.status(500).json({ message: "Error fetching favourites" });
+// Add a recipe to favourites
+router.post("/favourites", authorize, async (req, res) => {
+  const { recipe_id, recipe_name, recipe_image } = req.body;
+
+  if (!recipe_id || !recipe_name || !recipe_image) {
+    return res.status(400).json({ msg: "Recipe details are required" });
+  }
+
+  try {
+    const favouriteExists = await knex("favourites")
+      .where({ user_id: req.token.id, recipe_id })
+      .first();
+
+    if (favouriteExists) {
+      return res.status(409).json({ msg: "Recipe already in favourites" });
     }
-    res.json(results);
-  });
+
+    await knex("favourites").insert({
+      user_id: req.token.id,
+      recipe_id,
+      recipe_name,
+      recipe_image,
+    });
+
+    res.status(201).json({ msg: "Recipe added to favourites" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ msg: `Error adding to favourites: ${error.message}` });
+  }
 });
 
-// Add a recipe to favourites
-router.post("/", (req, res) => {
-  const { idMeal, strMeal, strMealThumb } = req.body;
+// Get all favourites for the logged-in user
+router.get("/favourites", authorize, async (req, res) => {
+  try {
+    const favourites = await knex("favourites")
+      .where({ user_id: req.token.id })
+      .select("recipe_id", "recipe_name", "recipe_image");
 
-  // Check if the recipe already exists
-  db.query(
-    "SELECT * FROM favourites WHERE idMeal = ?",
-    [idMeal],
-    (err, results) => {
-      if (err) {
-        console.error("Error checking existing recipe:", err);
-        return res.status(500).json({ message: "Error checking recipe" });
-      }
-
-      if (results.length > 0) {
-        return res
-          .status(400)
-          .json({ message: "Recipe already in favourites" });
-      }
-
-      // Insert the recipe into the database
-      const query =
-        "INSERT INTO favourites (idMeal, strMeal, strMealThumb) VALUES (?, ?, ?)";
-      db.query(query, [idMeal, strMeal, strMealThumb], (err) => {
-        if (err) {
-          console.error("Error adding recipe to favourites:", err);
-          return res.status(500).json({ message: "Error adding recipe" });
-        }
-        res.status(201).json({ message: "Recipe added to favourites" });
-      });
-    }
-  );
+    res.json(favourites);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ msg: `Error fetching favourites: ${error.message}` });
+  }
 });
 
 // Remove a recipe from favourites
-router.delete("/:idMeal", (req, res) => {
-  const { idMeal } = req.params;
+router.delete("/favourites/:recipe_id", authorize, async (req, res) => {
+  const { recipe_id } = req.params;
 
-  db.query("DELETE FROM favourites WHERE idMeal = ?", [idMeal], (err) => {
-    if (err) {
-      console.error("Error removing recipe:", err);
-      return res.status(500).json({ message: "Error removing recipe" });
+  try {
+    const deleted = await knex("favourites")
+      .where({ user_id: req.token.id, recipe_id })
+      .del();
+
+    if (!deleted) {
+      return res.status(404).json({ msg: "Recipe not found in favourites" });
     }
-    res.status(200).json({ message: "Recipe removed from favourites" });
-  });
+
+    res.json({ msg: "Recipe removed from favourites" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ msg: `Error removing from favourites: ${error.message}` });
+  }
 });
 
 export default router;
