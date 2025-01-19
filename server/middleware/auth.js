@@ -6,9 +6,7 @@ const authorize = (req, res, next) => {
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     console.log("Authorization header missing or malformed");
-    return res
-      .status(401)
-      .json({ msg: "No token provided, authorization denied" });
+    return res.status(401);
   }
 
   const token = authHeader.split(" ")[1];
@@ -23,7 +21,7 @@ const authorize = (req, res, next) => {
     next();
   } catch (error) {
     console.error("Token verification failed:", error.message);
-    return res.status(403).json({ msg: "Invalid token, authorization denied" });
+    return res.status(403);
   }
 };
 

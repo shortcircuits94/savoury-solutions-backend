@@ -1,7 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
 import mysql from "mysql2";
-import favouritesRoutes from "./routes/favourites.js";
 import cors from "cors";
 import usersRoutes from "./routes/users.js";
 import knexConfig from "../knexfile.js";
@@ -19,7 +18,6 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/favourites", favouritesRoutes);
 app.use("/users", usersRoutes);
 app.get("/", (req, res) => {
   res.send("Hello");
