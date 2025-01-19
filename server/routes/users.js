@@ -11,9 +11,6 @@ const router = express.Router();
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-// Custom middleware to check JWT tokens on protected routes
-import authorise from "../middleware/auth.js";
-
 // Used when hashing the user's password (more salt rounds = stronger encryption)
 const SALT_ROUNDS = 8;
 
@@ -41,7 +38,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Login Route
 router.post("/login", async (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res
@@ -50,10 +46,8 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    // Query the DB for a user with the email address provided in the request body
     const user = await knex("users").where({ email: req.body.email }).first();
 
-    // Use bcrypt to check whether the password sent in the request body matches the hashed password in the DB
     const result = await bcrypt.compare(req.body.password, user.password);
 
     if (!result) {
@@ -61,10 +55,6 @@ router.post("/login", async (req, res) => {
         .status(403)
         .json({ message: "Username/Password combination is incorrect" });
     }
-
-    // Use the jwt library to generate a JWT token for the user.
-    // Include the id and email of the user in the payload of the JWT
-    // We can access the data in the payload of the JWT later (when the user accesses a protected page)
     const token = jwt.sign(
       {
         id: user.id,
@@ -74,14 +64,12 @@ router.post("/login", async (req, res) => {
       { expiresIn: "8h" }
     );
 
-    // Send the JWT token to the client
     res.json({ authToken: token });
   } catch (error) {
     res.status(400).json({ message: "User not found" });
   }
 });
 
-// Add a recipe to favourites
 router.post("/favourites", authorize, async (req, res) => {
   const { recipe_id, recipe_name, recipe_image } = req.body;
 
@@ -90,7 +78,6 @@ router.post("/favourites", authorize, async (req, res) => {
   }
 
   try {
-    // Check if the recipe already exists in favourites for the logged-in user
     const favouriteExists = await knex("favourites")
       .where({ user_id: req.token.id, recipe_id })
       .first();
@@ -99,7 +86,6 @@ router.post("/favourites", authorize, async (req, res) => {
       return res.status(409).json({ msg: "Recipe already in favourites" });
     }
 
-    // Insert the new favourite into the database
     await knex("favourites").insert({
       user_id: req.token.id,
       recipe_id,
@@ -115,7 +101,6 @@ router.post("/favourites", authorize, async (req, res) => {
   }
 });
 
-// Get all favourites for the logged-in user
 router.get("/favourites", authorize, async (req, res) => {
   try {
     const favourites = await knex("favourites")
@@ -130,7 +115,6 @@ router.get("/favourites", authorize, async (req, res) => {
   }
 });
 
-// Remove a recipe from favourites
 router.delete("/favourites/:recipe_id", authorize, async (req, res) => {
   const { recipe_id } = req.params;
 
