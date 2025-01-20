@@ -8,10 +8,4 @@ export default {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
   },
-  migrations: {
-    directory: "./migrations",
-  },
-  seeds: {
-    directory: "./seeds",
-  },
 };
