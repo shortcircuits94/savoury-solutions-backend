@@ -22,6 +22,14 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+app.use(
+  cors({
+    origin: "https://savoury-solutions-bfe067d4c6f4.herokuapp.com/",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.options("*", cors());
 app.options("*", cors(corsOptions));
 
