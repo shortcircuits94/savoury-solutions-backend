@@ -1,5 +1,12 @@
 {
   "type": "module",
+  "start": "node server/app.js",
+  "scripts": {
+    "start": "node index",
+    "dev": "node --watch index",
+    "migrate": "knex migrate:latest",
+    "rollback": "knex migrate:rollback"
+  },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
