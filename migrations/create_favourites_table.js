@@ -1,5 +1,12 @@
 export async function up(knex) {
   await knex.schema
+    .createTable("users", (table) => {
+      table.increments("id").primary();
+      table.string("name").notNullable();
+      table.string("email").unique().notNullable();
+      table.string("password").notNullable();
+      table.timestamps(true, true);
+    })
     .createTable("favourites", (table) => {
       table.increments("id").primary();
       table.integer("user_id").unsigned().notNullable();
@@ -11,13 +18,6 @@ export async function up(knex) {
       table.string("recipe_id").notNullable();
       table.string("recipe_name").notNullable();
       table.text("recipe_image").notNullable();
-      table.timestamps(true, true);
-    })
-    .createTable("users", (table) => {
-      table.increments("id").primary();
-      table.string("name").notNullable();
-      table.string("email").unique().notNullable();
-      table.string("password").notNullable();
       table.timestamps(true, true);
     });
 }
