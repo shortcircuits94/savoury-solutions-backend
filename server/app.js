@@ -8,32 +8,28 @@ import initKnex from "knex";
 
 const knex = initKnex(knexConfig);
 
-// Initialize the app first
+// Initialize express app
 const app = express();
 dotenv.config();
 const port = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
-app.use(
-  cors({
-    origin: "https://savoury-solutions.netlify.app",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-app.use(
-  cors({
-    origin: "https://savoury-solutions-bfe067d4c6f4.herokuapp.com/",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// CORS configuration
+const corsOptions = {
+  origin: "https://savoury-solutions.netlify.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
-app.options("*", cors());
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Pre-flight requests
 app.options("*", cors(corsOptions));
 
+// Parse JSON bodies
 app.use(express.json());
+
 // Routes
 app.use("/users", usersRoutes);
 app.get("/", (req, res) => {
