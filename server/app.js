@@ -12,7 +12,7 @@ const app = express();
 dotenv.config();
 const port = process.env.PORT || 5173;
 
-// Custom middleware to set CORS headers
+// Enable CORS for all routes
 app.use((req, res, next) => {
   res.header(
     "Access-Control-Allow-Origin",
@@ -24,29 +24,13 @@ app.use((req, res, next) => {
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
   res.header("Access-Control-Allow-Credentials", "true");
-
-  // Handle preflight requests
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
   next();
 });
 
-// Also keep the cors middleware as a backup
-app.use(
-  cors({
-    origin: "https://savoury-solutions.netlify.app",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: [
-      "Origin",
-      "X-Requested-With",
-      "Content-Type",
-      "Accept",
-      "Authorization",
-    ],
-  })
-);
+// Handle OPTIONS requests
+app.options("*", (req, res) => {
+  res.status(200).end();
+});
 
 app.use(express.json());
 app.use("/users", usersRoutes);
