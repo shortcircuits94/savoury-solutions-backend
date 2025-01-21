@@ -10,31 +10,28 @@ const knex = initKnex(knexConfig);
 
 const app = express();
 dotenv.config();
-const port = process.env.PORT || 5173;
+const port = process.env.PORT || 5000;
 
-// Enable CORS for all routes
-app.use((req, res, next) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://savoury-solutions.netlify.app"
-  );
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
+// CORS configuration
+const corsOptions = {
+  origin: [
+    "https://savoury-solutions.netlify.app",
+    // Add other allowed origins if needed
+    "http://localhost:5173", // For local development
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // If you're using cookies or authentication headers
+  optionsSuccessStatus: 200,
+};
 
-// Handle OPTIONS requests
-app.options("*", (req, res) => {
-  res.status(200).end();
-});
+// Apply CORS with configuration
+app.use(cors(corsOptions));
+app.use(cors());
+app.options("*", cors());
 
 app.use(express.json());
 app.use("/users", usersRoutes);
-
 app.get("/", (req, res) => {
   res.send("Hello");
 });
