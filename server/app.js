@@ -11,17 +11,19 @@ const knex = initKnex(knexConfig);
 const app = express();
 dotenv.config();
 const port = process.env.PORT || 5000;
-app.use(express.urlencoded({ extended: true }));
-// CORS configuration
-const corsOptions = {
-  origin: ["https://savoury-solutions.netlify.app", "http://localhost:5173"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: "*",
-  credentials: true,
-};
+// app.use(express.urlencoded({ extended: true }));
+// // CORS configuration
+// const corsOptions = {
+//   origin: ["https://savoury-solutions.netlify.app", "http://localhost:5173"],
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//   allowedHeaders: "*",
+//   credentials: true,
+// };
 
-// Apply CORS with options
-app.use(cors(corsOptions));
+// // Apply CORS with options
+// app.use(cors(corsOptions));
+app.use(cors({ origin: "https://savoury-solutions.netlify.app", "http://localhost:5173" }));
+app.options("*", cors()); 
 app.use(express.json());
 
 // Routes
