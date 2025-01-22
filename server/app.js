@@ -11,7 +11,7 @@ const knex = initKnex(knexConfig);
 const app = express();
 dotenv.config();
 const port = process.env.PORT || 5000;
-
+app.use(express.urlencoded({ extended: true }));
 // CORS configuration
 const corsOptions = {
   origin: ["https://savoury-solutions.netlify.app", "http://localhost:5173"],
