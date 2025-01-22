@@ -16,9 +16,8 @@ const port = process.env.PORT || 5000;
 const corsOptions = {
   origin: ["https://savoury-solutions.netlify.app", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: "*",
   credentials: true,
-  maxAge: 86400, // 24 hours
 };
 
 // Apply CORS with options
